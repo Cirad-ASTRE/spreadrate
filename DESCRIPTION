@@ -1,0 +1,23 @@
+Package: spreadrate
+Type: Package
+Title: Estimate the spread-rate of epidemics
+Version: 0.0-1
+Date: 2019-06-04
+Authors@R: person("Facundo", "Muñoz",
+    email = "facundo.munoz@cirad.fr",
+    role = c("aut", "cre"),
+    comment = c(ORCID = "0000-0002-5061-4241"))
+Description: Estimate the local velocity of propagation of an epidemic
+    event, given dates and locations of observed cases. The method
+    estimates the surface of first date of invasion by interpolation
+    of the earliest observations in a neighbourhood and derives the
+    local spread rate as the inverse slope of the surface. Quantify
+    the estimation uncertainty by a Monte Carlo approach. Visualise 
+    and simulate the spatio-temporal progress of epidemics.
+Depends: R (>= 3.2)
+License: GPL-3 | file LICENSE
+Language: en-GB
+Encoding: UTF-8
+LazyData: true
+URL: https://Cirad-ASTRE.github.io/spreadrate
+BugReports: https://github.com/Cirad-ASTRE/spreadrate/issues
