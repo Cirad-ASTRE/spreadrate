@@ -584,17 +584,6 @@ fa2sr <- function(fa_est, filter_percentile = 1, bnd) {
 }
 
 
-#' Modify a vector of dates by a random quantity in [-e, e]
-#' The distribution decreases exponentially, with rate 1/2
-time_jitter <- function(x, e) {
-
-  prob_p <- 1/2^seq(0, e)
-  probs <- c(rev(prob_p), tail(prob_p, -1))
-  # probs <- probs/sum(probs)  # unnecessary
-
-  x + sample(seq(-e, e), size = length(x), prob = probs, replace = TRUE)
-
-}
 
 #' Summaries of Monte Carlo samples
 #'
