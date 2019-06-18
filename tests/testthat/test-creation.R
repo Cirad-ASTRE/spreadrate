@@ -83,7 +83,7 @@ test_that("sr_obs() fails if time variable is missing", {
 
 test_that("sr_obs() preserves coordinates", {
   d <- data.frame(lon = 1:3, lat = 1:3, t = Sys.Date() + 1:3)
-  r <- sr_obs(d, "t", uq)
+  r <- sr_obs(d, "t")
 
   expect_true(
     isTRUE(
@@ -100,27 +100,27 @@ test_that("sr_obs() preserves coordinates", {
 test_that("sr_obs() produces Monte Carlo samples conforming to uq",{
 
   set.seed(20190617)
-  Npoints <- 50
-  nsim = 50
+  Npoints <- 40
+  nsim = 60
 
   d <- data.frame(
     lon = runif(Npoints, 0, 10),
     lat = runif(Npoints, -10, 10),
     t = Sys.Date() + seq.int(Npoints))
 
-  ## the points in mc are within space tolerance from r
+  ## the points in mc are within space tolerance from x0
   ## coordinates are jittered independently within the interval
   ## (-radius, radius).
-  expect_within_radius <- function(x, radius) {
+  expect_within_radius <- function(x, x0, radius) {
     all(
-      abs(st_coordinates(x) - st_coordinates(r)) <= radius
+      abs(st_coordinates(x) - st_coordinates(x0)) <= radius
     )
   }
 
-  expect_within_time <- function(x, time) {
+  expect_within_time <- function(x, x0, time) {
     ## the times are jittered within time tolerance with a decreasing
     ## distribution approximately halving each time
-    time_diffs <- as.numeric(x$t - r$t)
+    time_diffs <- as.numeric(x$t - x0$t)
     if (any(abs(time_diffs) > time)) return(FALSE)
 
     ## The first half of this vector should be appr. 1 and the second
@@ -156,8 +156,8 @@ test_that("sr_obs() produces Monte Carlo samples conforming to uq",{
 
     ## the points are jittered within space tolerance in each
     ## dimension separately
-    expect_true(all(vapply(mc, expect_within_radius, TRUE, space)))
-    expect_true(all(vapply(mc, expect_within_time, TRUE, time)))
+    expect_true(all(vapply(mc, expect_within_radius, TRUE, r, space)))
+    expect_true(all(vapply(mc, expect_within_time, TRUE, r, time)))
 
   }
 
