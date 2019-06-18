@@ -2,6 +2,7 @@
 
 export(dist2arc)
 export(get_lonlatvars)
+export(neigh_tol)
 export(sr_obs)
 export(sr_uq)
 import(furrr)

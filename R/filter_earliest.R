@@ -1,4 +1,46 @@
 
+#' Neighbourhood Tolerance Parameter
+#'
+#' Get the value or interval of the Neighbourhood Tolerance Parameter
+#' of a \code{sr_obs} object.
+#'
+#' This function retrieves the values set during creation with
+#' \code{sr_obs} in absolute terms, performing the convertion from
+#' values relative to the diameter of the dataset if necessary. See
+#' \code{\link{sr_uq}}.
+#'
+#' @param x A \code{sr_obs} object.
+#'
+#' @return A numeric vector of size 1 or 2. Either a constant value
+#' for this parameter or a interval with distance values in m.
+#' @export
+#'
+#' @examples
+#'   d <- data.frame(lon = 1:3, lat = 1:3, date = 1:3)
+#'
+#'   ## Here, the neighbourhood tolerance parameter is set between
+#'   ## 2.5 % of the dataset diameter and 1 km.
+#'   ## Note that the resulting distances are in m, even if the
+#'   ## original coordinates are geographic.
+#'   obs <- sr_obs(d, "date", uq = sr_uq(neigh_tol = c(-2.5, 1e4)))
+#'   neigh_tol(obs)
+neigh_tol <- function(x) {
+
+  stopifnot(inherits(x, "sr_obs"))
+
+  neigh_tol <- attr(x, "uq")$neigh_tol
+
+  ## Handle negative neighbourhood parameters (relative to diameter)
+  if (any(idx <- neigh_tol < 0)) {
+    idx <- which(idx)
+    diameter <- as.numeric(max(st_distance(x)))
+    neigh_tol[idx] <- - diameter * neigh_tol[idx] / 100
+  }
+
+  return(neigh_tol)
+}
+
+
 #' Approximate angle for a distance
 #'
 #' Compute an approximate angle that correspond to a given distance
