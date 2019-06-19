@@ -24,6 +24,7 @@ BugReports: https://github.com/Cirad-ASTRE/spreadrate/issues
 Imports:
     furrr,
     ggplot2,
+    raster,
     sf
 Suggests: 
     testthat (>= 2.1.0)
