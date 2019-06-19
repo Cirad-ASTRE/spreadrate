@@ -1,5 +1,50 @@
 context("Filtering cases")
 
+test_that("Selection of representative points is reasonable", {
+
+  ## 50 points in the unit square in a general projection
+  set.seed(20190618)
+  x <- st_cast(
+    st_sfc(
+      st_multipoint(
+        matrix(runif(100), ncol = 2)
+      ),
+      crs = 3857
+    ),
+    "POINT"
+  )
+
+  d_tol <- .5
+  rx <- representative_points(x, dTolerance = d_tol)
+
+  # ggplot(x) + geom_sf() + geom_sf(data = rx, col = "red") +
+  #   ggforce::geom_circle(
+  #     data = data.frame(st_coordinates(rx), r = d_tol),
+  #     aes(x0 = X, y0 = Y, r = r))
+
+  ## All points are from x, but some are left out
+  expect_equal(st_intersection(x, rx), st_geometry(rx),
+               check.attributes = FALSE)
+  expect_true(nrow(rx) < length(x))
+
+  ## All original points are within dTolerance from one of the
+  ## selected points
+  ## Look at the second min distance (as the first is always the
+  ## self-distance which is zero)
+  min2 <- function(x) sort(x)[2]
+  expect_true(all(apply(st_distance(rx, x), 1, min2) < d_tol))
+
+  ## If the tolerance is small enough, all points are taken
+  small_d <- sort(unique(st_distance(x)))[2] / 2
+  rx <- representative_points(x, small_d)
+  expect_equal(st_intersection(x, rx), st_geometry(rx),
+               check.attributes = FALSE)
+  expect_identical(nrow(rx), length(x))
+
+})
+
+
+
 test_that("The approximation of arc-distances works as expected", {
 
   expect_maxerror <- function(x, test_d, tol) {

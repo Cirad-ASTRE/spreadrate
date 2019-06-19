@@ -1,3 +1,78 @@
+#' Choose representative points
+#'
+#' Select a subset of points at a minimum tolerance distance from
+#' each other.
+#'
+#' @param x Object of class \code{sf}
+#' @param dTolerance Numeric. Distance tolerance in m.
+#'
+#' @return Object of class \code{sf} with a subset of the original
+#' locations in \code{x}.
+#'
+#' @export
+#' @import INLA
+#'
+#' @examples
+#'
+#' ## 50 points in the unit square
+#' x <- st_sfc(st_multipoint(matrix(runif(100), ncol = 2)), crs = 3857)
+#' representative_points(x, .5)
+representative_points <- function(x, dTolerance) {
+
+
+  # bnd <- inla.nonconvex.hull(
+  #   coord_x,
+  #   convex = 0,
+  #   concave = -0.15,
+  #   resolution = 40
+  # )
+
+  ## If x is in geographical coordinates, consider the distance in
+  ## decimal degrees, as the mean arc-distance in latitude and longitude
+  ## in the centroid of the dataset.
+  ## If the approximation is too rough, issue a warning.
+  gx <- st_geometry(x)
+  coord_x <- st_coordinates(gx)[, 1:2]
+
+  if (isTRUE(st_is_longlat(gx))) {
+    ## st_centroid warns about imprecise results with geographical
+    ## coordinates. We just want a central point. No need for precision.
+    xc <- suppressWarnings(st_centroid(st_union(gx)))
+    arcdist <- dist2arc(xc, dTolerance)
+
+    if ( (rel_err <- attr(arcdist, "average_error") / dTolerance) > 2/10 ) {
+      warning(
+        paste0(
+          "Approximating distances with a relative error of ",
+          round(rel_err * 100), "%. ",
+          "Consider projecting the sr_obs object with st_transform()."
+        )
+      )
+    }
+
+    dTolerance <- as.numeric(arcdist)
+  }
+
+
+  mesh <- inla.mesh.create(
+    loc = coord_x,
+    boundary = inla.mesh.segment(coord_x[rev(chull(coord_x)),]),
+    extend = FALSE,
+    refine = FALSE,
+    cutoff = dTolerance
+  )
+  # x %>% ggplot2::ggplot() + inlabru::gg(mesh) + ggplot2::geom_sf()
+
+  ans <-
+    mesh$loc[, 1:2] %>%
+    st_multipoint() %>%
+    st_sfc(crs = st_crs(x)) %>%
+    st_cast("POINT") %>%
+    st_sf()
+
+  return(ans)
+}
+
 
 #' Neighbourhood Tolerance Parameter
 #'
