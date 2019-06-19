@@ -1,3 +1,109 @@
+#' Earliest observations within a neighbourhood
+#'
+#' Select a subset of the observation points at least \code{tol} m far
+#' apart as representative of the emph{neighbourhood}. Assign the
+#' earliest times observed in the neighbourhood to them.
+#'
+#' Note that the neighbouring distance must be expressed in m, even
+#' when the coordinates are geographical.
+#'
+#' This function reproduces the operation for all the Monte Carlo
+#' replicates if any.
+#'
+#' For the original dataset, the neighbouring tolerance parameter
+#' is the mean value of the interval specified in its \code{uq}.
+#'
+#' @param x sr_obs object.
+#' @param dist Distance parameter in m.
+#'
+#' @return Another sr_obs object with a subset of the points and
+#' the earliest times observed in the neighbourhood of each.
+#'
+#' @export
+#' @import furrr
+#'
+#' @examples
+#'   d <- data.frame(lon = runif(30), lat = runif(30), date = 1:30)
+#'
+#'   ## Use between 10 and 20 % of data diameter as neighbouring
+#'   ## tolerance. The main result will use exactly 15% while the
+#'   ## \code{mc} replicates will use random Gaussian values from
+#'   ## that interval (at 99.9%)
+#'   sruq <- sr_uq(10, 0, 1, neigh_tol = c(-10, -20))
+#'   sro <- sr_obs(d, "date", uq = sruq)
+#'   srf <- filter_earliest_neigh(sro)
+filter_earliest_neigh <- function(x) {
+
+  ## Neighbourhood tolerance parameter (in m)
+  ## Can be a number or an interval
+  ntp <- neigh_tol(x)
+
+  ## Fixed tolerance for the original dataset
+  ## If interval, dist is the mid-point
+  d_tol <- mean(ntp)
+
+  ## Use the triangulation methdos in INLA's fmesher for selecting
+  ## the subset of points
+  ans <- representative_points(x, d_tol)
+
+  # ggplot(x) + geom_sf() + geom_sf(data = ans, col = "red")
+
+  ## Capture the minimum value of the neighbouring points
+  neighbours <-
+    st_is_within_distance(ans, x, d_tol, sparse = TRUE)
+  timevar <- attr(x, "timevar")
+  ans[[timevar]] <-
+    vapply(
+      neighbours,
+      function(.) min(x[[timevar]][.]),
+      x[[timevar]][1]
+    )
+
+  ## Preserve class of the timevar (e.g. for dates) if any
+  if (!is.null(cl <- attr(x[[timevar]], "class"))) {
+    class(ans_times) <- cl
+  }
+
+  ## Move geometry to last position
+  ans <- dplyr::select(ans, -geometry, geometry)
+
+  ## Preserve attributes
+  ans <- structure(
+    ans,
+    timevar = timevar,
+    uq = within(attr(x, "uq"), neigh_tol <- d_tol),
+    class = class(x)
+  )
+
+  ## Perform the same operation recursively for the Monte Carlo
+  ## replicas (if any)
+  mc <- attr(x, "mc")
+
+  if (!is.null(mc)) {
+    nsim <- attr(x, "uq")$nsim
+    stopifnot(identical(length(mc), nsim))
+
+    ## UQ variability in neighbourhood threshold parameter
+    rntp <- if(length(ntp) > 1) {
+      rnorm(nsim, mean = d_tol, sd = diff(ntp)/6)
+    } else {
+      rep(d_tol, nsim)
+    }
+
+    ## In-place modification of neigh_tol values for the MC samples
+    for (i in seq.int(nsim)) {
+      attr(mc[[i]], "uq")$neigh_tol <- rntp[i]
+    }
+
+    ans_mc <- future_map(mc, filter_earliest_neigh)
+
+    attr(ans, "mc") <- ans_mc
+  }
+
+  return(ans)
+}
+
+
 #' Choose representative points
 #'
 #' Select a subset of points at a minimum tolerance distance from
