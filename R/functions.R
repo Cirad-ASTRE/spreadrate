@@ -1,76 +1,3 @@
-#' Convert angles from sexagesimal to decimal format
-sexa2dec <- function(deg, min, sec) {
-  as.numeric(deg) + as.numeric(min)/60 + as.numeric(sec)/3600
-}
-
-
-#' Clean up ASF reported cases in Belgium
-cleanup <- function(dat_raw, target_crs) {
-
-  asf_be <-
-    dat_raw %>%
-    ## Remove empty columns
-    select_if(~!all(is.na(.))) %>%
-    ## Compute coordinates in decimal degrees
-    mutate(
-      lon = sexa2dec(`Longitude x�`, `Longitude y'`, `Longitude z''`),
-      lat = sexa2dec(`Latitude x�`, `Latitude y'`, `Latitude z''`)
-    ) %>%
-    ## Dates
-    mutate(
-      date = as.Date(
-        ifelse(
-          is.na(`Suspicion date`),
-          `Confirmation date`,
-          `Suspicion date`
-        ),
-        format="%d/%m/%Y"
-      )
-    ) %>%
-    arrange(
-      ## Descending order, for plotting
-      ## most recent cases plotted first and earlier cases
-      ## plotted on top.
-      desc(date)
-    ) %>%
-    mutate(
-      month = fct_inorder(months(date), ordered = TRUE)
-    ) %>%
-    ## Select relevant variables
-    dplyr::select(
-      lon, lat, date, month
-    ) %>%
-    clean_names() %>%
-    st_as_sf(
-      coords = c("lon", "lat"),
-      crs = 4326
-    ) %>%
-    st_transform(st_crs(target_crs))
-
-  return(asf_be)
-}
-
-#' Prepare cartography of the region
-get_cartography <- function(countries.names, crs) {
-
-  countries.iso3 <-
-    raster::ccodes() %>%
-    filter(NAME %in% countries.names) %>%
-    with(., as.vector(ISO3))
-
-  # I tried cartography::countries.spdf but it is too coarse
-  countries <-
-    purrr::map(
-      countries.iso3,
-      ~getData(path = here::here("data"), country = ., level = 0)
-    ) %>%
-    purrr::map(st_as_sf) %>%
-    do.call(rbind, .) %>%
-    st_transform(crs) %>%   # https://epsg.io/27561
-    ## relationship between attributes and geometries
-    st_set_agr("identity")
-
-}
 
 asfbel_animation <- function(asf_be, countries, output_file) {
 
@@ -292,17 +219,17 @@ envelope <- function(x, buffer_dist = .8e3) {
   st_sfc(crs = st_crs(x))
 }
 
-StatEnvelope <- ggproto(
-  "StatEnvelope", Stat,
-  required_aes = "geometry",
-  compute_group = function(data, scales) {
-    if(nrow(data) <= 2) return (NULL)
-    data %>%
-      group_by_at(vars(-geometry)) %>%
-      summarise(geometry = envelope(sf::st_combine(geometry))) %>%
-      ungroup()
-  }
-)
+# StatEnvelope <- ggproto(
+#   "StatEnvelope", Stat,
+#   required_aes = "geometry",
+#   compute_group = function(data, scales) {
+#     if(nrow(data) <= 2) return (NULL)
+#     data %>%
+#       group_by_at(vars(-geometry)) %>%
+#       summarise(geometry = envelope(sf::st_combine(geometry))) %>%
+#       ungroup()
+#   }
+# )
 
 geom_envelope <- function(...){
   suppressWarnings(
@@ -317,144 +244,7 @@ geom_envelope <- function(...){
 }
 
 
-# StatChull <- ggproto(
-#   "StatChull", Stat,
-#   compute_group = function(data, scales) {
-#     # data[chull(data$x, data$y), , drop = FALSE]
-#
-#     hull_df <- data.frame(st_coordinates(envelope(st_sfc(sf::st_multipoint(cbind(data$x, data$y))))))
-#     names(hull_df) <- c("x", "y", "L1", "L2")
-#
-#
-#     ## Further aesthetics
-#     data.frame(hull_df, data[1, -match(c("x", "y"), names(data)), drop = FALSE], row.names = NULL)
-#
-#   },
-#
-#   required_aes = c("x", "y")
-# )
-# GeomPolygonHollow <- ggproto("GeomPolygonHollow", GeomPolygon,
-#                              default_aes = aes(colour = "black", fill = NA, size = 0.5, linetype = 1,
-#                                                alpha = NA)
-# )
-# geom_chull <- function(mapping = NULL, data = NULL,
-#                        position = "identity", na.rm = FALSE, show.legend = NA,
-#                        inherit.aes = TRUE, ...) {
-#   layer(
-#     stat = StatChull, geom = GeomPolygonHollow, data = data, mapping = mapping,
-#     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-#     params = list(na.rm = na.rm, ...)
-#   )
-# }
 
-
-## Given a set of points and a column name with values
-## return a subset of points at least a given distance apart from
-## each other, with the minimum value found in the neighbourhood
-min_neigh <- function(x, value, dist) {
-
-  ## Subset of points at least dist far apart from each other
-  # ans <-
-  #   st_triangulate(st_combine(x), dTolerance = dist) %>%
-  #   st_collection_extract("POLYGON") %>%
-  #   st_coordinates() %>%
-  #   `[`(, c("X", "Y")) %>%
-  #   unique() %>%
-  #   unname() %>%
-  #   st_multipoint() %>%
-  #   st_sfc(crs = st_crs(x)) %>%
-  #   st_sf() %>%
-  #   st_cast("POINT")
-
-  ## Better use the triangulation methdos in INLA's fmesher
-  ans <- representative_points(x, dist)
-
-  ## Capture the minimum value of the neighbouring points
-  ans[[value]] <-
-    ans %>%
-    st_is_within_distance(x, dist = dist, sparse = TRUE) %>%
-    # map_dbl(~min(x[[value]][.]))
-    vapply(function(.) min(x[[value]][.]), x[[value]][1])
-
-  if (!is.null(cl <- attr(x[[value]], "class"))) {
-    ## preserve class (e.g. for dates) if any
-    class(ans[[value]]) <- cl
-  }
-
-  ## Move geometry to last position
-  ans <- dplyr::select(ans, -geometry, geometry)
-
-  return(ans)
-}
-
-representative_points <- function(x, dTolerance) {
-
-  require(INLA)
-
-  coord_x <- st_coordinates(x)
-
-  # bnd <- inla.nonconvex.hull(
-  #   coord_x,
-  #   convex = 0,
-  #   concave = -0.15,
-  #   resolution = 40
-  # )
-
-  mesh <- inla.mesh.create(
-    loc = st_coordinates(x),
-    boundary = inla.mesh.segment(coord_x[rev(chull(coord_x)),]),
-    extend = FALSE,
-    refine = FALSE,
-    cutoff = dTolerance
-  )
-  # x %>% ggplot() + gg(mesh) + geom_sf()
-
-  ans <-
-    mesh$loc[, 1:2] %>%
-    st_multipoint() %>%
-    st_sfc(crs = st_crs(x)) %>%
-    st_cast("POINT") %>%
-    st_sf()
-
-  return(ans)
-}
-
-#' Raster termplate for prediction
-#' x: scf_POINT dataset
-#' buffer_size: expansion of the extent
-estimation_mask <- function(x, buffer_size, res = buffer_size/2) {
-
-  estimation_region <-
-    x %>%
-    st_combine() %>% # many points to 1 multipoint
-    st_convex_hull() %>%
-    st_buffer(dist = buffer_size) %>%  # 1 km buffer
-    st_sf()  # create sf object with the previous geometry
-
-  # estimation_region %>%
-  #   ggplot() +
-  #   geom_sf() +
-  #   geom_sf(data = x)
-
-  ## RasterLayer with values of 1 within the estimation_region
-  ## and NA elsewhere
-  # estimation_mask <-
-  #   fasterize(
-  #     estimation_region,
-  #     raster(estimation_region, res = as.numeric(buffer_size/2))
-  #   )
-
-  estimation_mask <-
-    rasterize(
-      as(estimation_region, "Spatial"),
-      raster(
-        as(estimation_region, "Spatial"),
-        res = as.numeric(res)
-      )
-    )
-
-  return(estimation_mask)
-}
 
 
 #' x: dataset
@@ -521,14 +311,6 @@ estimate_sr <- function(x, r, uq) {
   return(mcmcdat)
 }
 
-filter_earliest_neigh <- function(x, tol) {
-  min_neigh(x, "date", tol) %>%
-    arrange(desc(date)) %>%
-    mutate(
-      month = fct_inorder(months(date), ordered = TRUE),
-      day = as.numeric(date - min(date) + 1)
-    )
-}
 
 fit_surface <- function(x) {
   tps <- Tps(
