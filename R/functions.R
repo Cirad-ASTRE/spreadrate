@@ -312,20 +312,6 @@ estimate_sr <- function(x, r, uq) {
 }
 
 
-fit_surface <- function(x) {
-  tps <- Tps(
-    st_coordinates(x),
-    x$day,
-    give.warning = TRUE
-  )
-}
-
-estimate_fa <- function(model, estimation_mask) {
-
-  ans <- setNames(interpolate(estimation_mask, model), "day")
-  ans[is.na(estimation_mask)] <- NA
-  return(ans)
-}
 
 #' fa_est: RasterLayer with estimated first-arrival (in days)
 #' filter_percentile: thershold for topping-up the highest values of

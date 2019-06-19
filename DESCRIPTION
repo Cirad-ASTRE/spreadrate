@@ -22,6 +22,7 @@ LazyData: true
 URL: https://Cirad-ASTRE.github.io/spreadrate
 BugReports: https://github.com/Cirad-ASTRE/spreadrate/issues
 Imports:
+    fields,
     furrr,
     ggplot2,
     raster,

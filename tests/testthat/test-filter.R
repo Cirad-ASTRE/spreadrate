@@ -7,16 +7,8 @@ test_that("Filtering earliest neighbours works as expected", {
   set.seed(20190619)
   d <- data.frame(lon = runif(30), lat = runif(30), date = 1:30)
   ## Use 30 % of data diameter as neighbouring tolerance.
-<<<<<<< HEAD
-  sro <- sr_obs(d, "date", uq = sr_uq(neigh_tol = -c(20, 30)))
-  srf <- filter_earliest_neigh(sro)
-||||||| parent of 89c11e0... fixup! filter_earliest_neigh(): identify earliest invasion dates for each neighbourhood represented by a point
-  sro <- sr_obs(obs_geo, "date", uq = sr_uq(neigh_tol = -c(20, 30)))
-  srf <- filter_earliest_neigh(sro)
-=======
   sro <- sr_obs(obs_geo, "date", uq = sr_uq(neigh_tol = -c(20, 30)))
   srf <- expect_error(filter_earliest_neigh(sro), NA)
->>>>>>> 89c11e0... fixup! filter_earliest_neigh(): identify earliest invasion dates for each neighbourhood represented by a point
   ntp <- neigh_tol(srf)
 
   # ggplot(sro) +
