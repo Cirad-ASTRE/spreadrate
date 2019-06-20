@@ -27,9 +27,7 @@ test_that("estimation_mask() works as expected", {
   # plot(em1); plot(p1, add = T)
 
   ## sr_obs object with coordinates in longlat
-  set.seed(20190619)
-  d <- data.frame(lon = runif(30), lat = runif(30), date = 1:30)
-  sro <- sr_obs(d, "date")
+  sro <- sr_obs(obs_geo, "date")
   em_sr <- expect_warning(
     estimation_mask(sro, buffer_size = bs, res = res),
     "longitude/latitude data"

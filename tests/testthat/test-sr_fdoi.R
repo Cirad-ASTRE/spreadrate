@@ -1,12 +1,8 @@
 context("First-date of invasion")
 
-test_that("sr_fdoi() interpolates data in geographical coordinates", {
+test_that("sr_fdoi() correctly interpolates data in geographical coordinates", {
 
-  set.seed(20190619)
-  ## sr_obs from random points in the unit square (of decimal degrees)
-  d <- data.frame(lon = runif(30), lat = runif(30))
-  d <- transform(d, date = round(10 * sqrt(lon**2 + lat**2)))
-  sro <- sr_obs(d, "date")
+  sro <- sr_obs(obs_geo, "date")
 
   ## A estimation mask covering the unit square
   r <- raster(
@@ -20,7 +16,7 @@ test_that("sr_fdoi() interpolates data in geographical coordinates", {
   fdoi <- expect_error(sr_fdoi(sro, r), NA)
 
   # plot(fdoi)
-  # points(d)
+  # points(obs_geo)
 
   ## The fdoi values must be approximately the distance of the cells
   ## to the origin times 10
@@ -36,22 +32,9 @@ test_that("sr_fdoi() interpolates data in geographical coordinates", {
 })
 
 
-test_that("sr_fdoi() interpolates data in planar coordinates", {
+test_that("sr_fdoi() correctly interpolates data in planar coordinates", {
 
-  set.seed(20190619)
-  ## sr_obs from random points in a 10x10 square
-  d <- st_cast(
-    st_sfc(
-      st_multipoint(
-        matrix(runif(2*30), ncol = 2) * 10
-      ),
-      crs = 3857
-    ),
-    "POINT"
-  )
-  d_dists <- sqrt(rowSums(st_coordinates(d)**2))
-  dsf <- st_sf(d, date = round(d_dists))
-  sro <- sr_obs(dsf, "date")
+  sro <- sr_obs(obs_prj, "date")
 
   ## A estimation mask covering the 10x10 square
   r <- raster(
@@ -80,7 +63,6 @@ test_that("sr_fdoi() interpolates data in planar coordinates", {
 
 })
 
-
 test_that("sr_fdoi() estimates the surface for the MC replicates", {
 
   ## Use always the same relative neghbourhood threshold parameter
@@ -103,3 +85,4 @@ test_that("sr_fdoi() estimates the surface for the MC replicates", {
   expect_identical(nsim, nlayers(mc))
 
 })
+
