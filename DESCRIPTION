@@ -29,6 +29,7 @@ Imports:
     sf,
     sp
 Suggests: 
+    INLA,
     testthat (>= 2.1.0)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 6.1.1
