@@ -1,3 +1,4 @@
+### Currently unused, but potentially interesting functions ###
 
 asfbel_animation <- function(asf_be, countries, output_file) {
 
@@ -193,7 +194,7 @@ asfbel_animation <- function(asf_be, countries, output_file) {
 
 }
 
-#' Compute an envelope for a set of points
+# Compute an envelope for a set of points
 envelope <- function(x, buffer_dist = .8e3) {
   # ## Using concaveman
   # x %>%
@@ -207,7 +208,7 @@ envelope <- function(x, buffer_dist = .8e3) {
   #     length_threshold = buffer_dist
   #   )
   ## Using INLA fmesher
-  require(INLA)
+  # require(INLA)
   x %>%
   st_coordinates() %>%
   inla.nonconvex.hull(
@@ -245,118 +246,11 @@ geom_envelope <- function(...){
 
 
 
-
-#' x: dataset
-#' r: raster template for prediction
-#' uq: list with parameters for Uncertainty Quantification
-#'   uq$space: maximum distance error in spatial coordinates
-#'   uq$time: maximum temporal error in number of days
-#'   uq$neigh_bnd: bounds of neighbourhood measure
-#'   uq$nsim: number of samples from each source of variation
-estimate_sr <- function(x, r, uq) {
-
-  ## Average spread-rate: half-diameter of the dataset
-  ## divided by total number of days
-  diameter_km <- as.numeric(max(st_distance(x)) / 1e3)
-  period_mn <- as.numeric(difftime(max(x$date), min(x$date)))/30
-  avg_sr <- diameter_km/2/period_mn
-
-  ## Prior spread-rate support (in km/month)
-  ## 20 times less or more than average
-  sr_bnd <- signif(avg_sr, 2) * c(1/20, 20)
-
-
-  set.seed(20190426)
-
-  ## Variation in data resolution
-  sim_datasets <-
-    future_map(
-      seq.int(uq$nsim),
-      ~st_jitter(x, uq$space) %>%
-        mutate(
-          date = time_jitter(date, uq$time),
-          month = fct_inorder(months(date), ordered = TRUE)
-        ) %>%
-        arrange(desc(date))
-    )
-  # plot(st_geometry(x), pch = 19)
-  # plot(st_geometry(st_jitter(x, 1e3)), pch = 19)
-
-  ## Variation in neighbourhood threshold
-  neigh_tol <- round(rnorm(uq$nsim, mean(uq$neigh_bnd), diff(uq$neigh_bnd)/6))
-
-  mcmcdat <-
-    tibble(
-      data = sim_datasets,
-      neigh_tol = neigh_tol
-    )
-
-  ## Run in parallel
-  mcmcdat <-
-    mcmcdat %>%
-    mutate(
-      x_earliest = future_map2(data, neigh_tol, filter_earliest_neigh),
-      tps = future_map(x_earliest, fit_surface),
-      ## The following two fail in parallel for somme reason
-      fa = lapply(tps, estimate_fa, estimation_mask = r),
-      sr = lapply(fa, fa2sr, filter_percentile = 1, bnd = sr_bnd)
-    )
-
-  ## Variation in conditional realisation of surface
-  ## This takes a lot of time and even hangs depending on
-  ## the case. Thus, I leave this factor out of the UQ for now.
-  # sim.Krig(fm, xp = coordinates(r))
-
-  return(mcmcdat)
-}
-
-
-
-#' fa_est: RasterLayer with estimated first-arrival (in days)
-#' filter_percentile: thershold for topping-up the highest values of
-#' spread-rate
-#' bnd: reasonable expected boundaries for the result in km/month
-#' Return spread rate in units of km/month
-fa2sr <- function(fa_est, filter_percentile = 1, bnd) {
-
-  ## spread-rate-neighbouring
-  ## need to use some projection so it understands that the coordinates
-  ## are in meters (not in degrees)
-  fa_est_slope <- terrain(fa_est, unit = "tangent")
-  sr_est <- setNames(1/fa_est_slope, "est_fasr")
-  ## Convert units from m/day to km/month
-  sr_est <- sr_est * 30 / 1e3
-
-  # image(
-  #   sr_est,
-  #   col = viridis::viridis(256),
-  #   asp = 1,
-  #   axes = FALSE,
-  #   ann = FALSE
-  #   )
-  # hist(sr_est)
-
-  ## Filter-out the x highest values of spread-rate
-  # min_sr <- quantile(values(sr_est), filter_percentile/100, na.rm = TRUE)
-  max_sr <- min(
-    bnd[2],
-    quantile(values(sr_est), 1-filter_percentile/100, na.rm = TRUE)
-  )
-
-  ## Apply limits
-  sr_est[sr_est > max_sr] <- max_sr
-  sr_est[sr_est < bnd[1]] <- bnd[1]
-
-  return(sr_est)
-}
-
-
-
-#' Summaries of Monte Carlo samples
-#'
-#' x: data.frame with MC results: data, neigh_tol, x_earliest, tps, fa, sr
-#' pts: sfc_POINTS with observed locations (where SR is assessed)
-#' int_prob: prbability level for MC intervals
+# Summaries of Monte Carlo samples
+#
+# x: data.frame with MC results: data, neigh_tol, x_earliest, tps, fa, sr
+# pts: sfc_POINTS with observed locations (where SR is assessed)
+# int_prob: prbability level for MC intervals
 sr_summaries <- function(x, pts, int_prob) {
   stack_sr <- stack(x$sr)
 
