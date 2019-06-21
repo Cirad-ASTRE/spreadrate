@@ -1,0 +1,162 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# spreadrate
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of spreadrate is to estimate the __local velocity of
+propagation__ of an epidemic event, given dates and locations of
+observed cases. 
+
+The method estimates the surface of __first date of invasion__ by
+interpolation of the earliest observations in a neighbourhood and
+derives the __local spread rate__ as the inverse slope of the surface.
+
+Furthermore, it helps to quantify the estimation uncertainty by a
+Monte Carlo approach. Visualise and simulate the spatio-temporal
+progress of epidemics.
+
+
+## Installation
+
+To install the latest version of spreadrate, copy and paste the 
+following in a R session.
+
+``` r
+if (!require("remotes")) {
+  install.packages("remotes")
+}
+install.packages("INLA", repos="https://inla.r-inla-download.org/R/testing")
+remotes::install_github("Cirad-ASTRE/mapMCDA")
+```
+
+
+
+## Example
+
+Suppose that we have recorded the GPS coordinates and observation
+dates for all the observed cases of some emerging disease in mainland
+France into a table like this one.
+
+```{r setup-fake-data, echo = FALSE, message=FALSE}
+require(sf)
+require(tidyverse)
+
+set.seed(20190621)
+fr_sf <- st_as_sf(maps::map("france", plot = FALSE)) %>%
+  st_transform(2154)
+locs <- st_sample(fr_sf, 50)
+
+## Assume dates progress at a constant rate from the north-east
+dist_NE <- st_distance(
+  locs, st_sfc(st_point(st_bbox(fr_sf)[c("xmax", "ymax")]), crs = 2154)
+) %>% as.numeric
+
+velocity <- 1e4  # m/day
+
+cases_sf <- st_sf(locs, date = as.Date("2019-01-01") + dist_NE / velocity) %>% 
+  arrange(date)
+
+```
+
+```{r show-table, echo = FALSE}
+
+(
+  cases <- bind_cols(
+    st_drop_geometry(cases_sf) %>% as_tibble(),
+    cases_sf %>%
+      st_transform(4326) %>%
+      st_coordinates() %>%
+      data.frame() %>% 
+      setNames(c("Lon", "Lat"))
+  )
+)
+
+```
+
+Here is a visual representation of these observed cases.
+
+```{r map-obs, echo = FALSE}
+require(tmap)
+tm_shape(fr_sf) +
+  ## Country limits
+  tm_polygons(col = "gray95") +
+  ## Observed cases
+  tm_shape(
+    cases_sf %>% 
+      mutate(
+        day_num = as.numeric(date - min(date))
+      )
+  ) +
+  tm_dots(
+    title = "Date",
+    col = "day_num",
+    size = .2,
+    palette = "viridis",
+    style = "cont",
+    breaks = c(0, as.numeric(diff(range(cases_sf$date)))),
+    labels = paste(range(cases_sf$date))
+  ) +
+  tm_legend(
+    position = c("left", "bottom"),
+    bg.color = TRUE
+  ) +
+  tm_compass(position = c("left", "top")) +
+  tm_scale_bar(position = c("right", "bottom"), size = .8)
+
+
+```
+
+First let `spreadrate` interpret the observational data appropriately
+with the function `sr_obs()`. You need to specify the name of the 
+temporal variable. _Lon_ and _Lat_ are recognised automatically.
+
+```{r sr-obs}
+library(spreadrate)
+cases_sr <- sr_obs(cases, "date")
+```
+
+However, spread-rate calculations require projected (rather than
+geographic) coordinates. An appropriate projection for mainland France
+is EPSG:2154. See https://epsg.io/.
+
+```{r transform-coordinates}
+cases_sr <- st_transform(cases_sr, crs = 2154)
+```
+
+Everything is now set to perform a default estimation of spread-rate.
+
+```{r warning = FALSE, message = FALSE}
+sr_est <- sr(cases_sr)
+```
+
+Done! Here is a quick plot of the estimated local spread-rate.
+The estimated velocity is practically constant, between 9 and 11 km /
+day.
+
+```{r quick-plot}
+raster::plot(sr_est, col = hcl.colors(12))
+```
+
+This is consistent with the value of `r velocity` m/day used for
+simulating the data.
+
+We can also retrieve the estimated surface of first-date of invasion:
+
+```{r}
+raster::plot(attr(sr_est, "fdoi"), col = hcl.colors(12))
+```
+
