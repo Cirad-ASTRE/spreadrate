@@ -26,7 +26,8 @@ Imports:
     furrr,
     ggplot2,
     raster,
-    sf
+    sf,
+    sp
 Suggests: 
     testthat (>= 2.1.0)
 Additional_repositories: https://inla.r-inla-download.org/R/testing

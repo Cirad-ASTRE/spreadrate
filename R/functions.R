@@ -246,7 +246,6 @@ geom_envelope <- function(...){
 
 
 
-
 #' x: dataset
 #' r: raster template for prediction
 #' uq: list with parameters for Uncertainty Quantification
