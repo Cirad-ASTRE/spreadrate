@@ -34,6 +34,7 @@ The average error is returned as an attribute.
 }
 \examples{
 
+require(sf)
 ## What angle yields 1 km at the equator? (and with which precision?)
 x0 <- st_sfc(st_point(c(0, 0)), crs = 4326)
 dist2arc(x0, 1e3)

@@ -21,6 +21,7 @@
 #'
 #' @export
 #' @import furrr
+#' @import lwgeom
 #'
 #' @examples
 #'   d <- data.frame(lon = runif(30), lat = runif(30), date = 1:30)
@@ -52,7 +53,7 @@ filter_earliest_neigh <- function(x) {
   neighbours <-
     st_is_within_distance(ans, x, d_tol, sparse = TRUE)
   timevar <- attr(x, "timevar")
-  ans[[timevar]] <-
+  ans_times <-
     vapply(
       neighbours,
       function(.) min(x[[timevar]][.]),
@@ -64,8 +65,11 @@ filter_earliest_neigh <- function(x) {
     class(ans_times) <- cl
   }
 
-  ## Move geometry to last position
-  ans <- dplyr::select(ans, -geometry, geometry)
+  ## Build sf object
+  ans <- st_sf(
+    setNames(data.frame(ans_times), timevar),
+    geometry = st_geometry(ans)
+  )
 
   ## Preserve attributes
   ans <- structure(
@@ -116,15 +120,16 @@ filter_earliest_neigh <- function(x) {
 #' locations in \code{x}.
 #'
 #' @export
-#' @import INLA
 #'
 #' @examples
 #'
 #' ## 50 points in the unit square
+#' require(sf)
 #' x <- st_sfc(st_multipoint(matrix(runif(100), ncol = 2)), crs = 3857)
 #' representative_points(x, .5)
 representative_points <- function(x, dTolerance) {
 
+  requireINLA()
 
   # bnd <- inla.nonconvex.hull(
   #   coord_x,
@@ -160,7 +165,7 @@ representative_points <- function(x, dTolerance) {
   }
 
 
-  mesh <- inla.mesh.create(
+  mesh <- INLA::inla.mesh.create(
     loc = coord_x,
     boundary = inla.mesh.segment(coord_x[rev(chull(coord_x)),]),
     extend = FALSE,
@@ -245,9 +250,11 @@ neigh_tol <- function(x) {
 #'   displacement in longitude and latitude by that magnitude
 #'   corresponds to approximately the given distance.
 #' @export
+#' @import lwgeom
 #'
 #' @examples
 #'
+#' require(sf)
 #' ## What angle yields 1 km at the equator? (and with which precision?)
 #' x0 <- st_sfc(st_point(c(0, 0)), crs = 4326)
 #' dist2arc(x0, 1e3)

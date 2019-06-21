@@ -15,14 +15,15 @@
 #'   pixel.
 #' @export
 #' @import raster
+#' @import lwgeom
 #'
 #' @examples
 #' d <- data.frame(lon = runif(30), lat = runif(30))
 #' d <- transform(d, date = round(10 * sqrt(lon**2 + lat**2)))
 #' sro <- sr_obs(d, "date")
-#' r <- raster(st_sf(sro), vals = 1)
+#' r <- raster::raster(sf::st_sf(sro), vals = 1)
 #' fdoi <- sr_fdoi(sro, r)
-#' plot(fdoi)
+#' raster::plot(fdoi, col = hcl.colors(12))
 #' points(d)
 sr_fdoi <- function(x, estimation_mask) {
 
@@ -60,7 +61,7 @@ sr_fdoi <- function(x, estimation_mask) {
 #' @return An object of class \code{Krig} and \code{Tps} which includes
 #' the fitted values and the model residuals. See
 #' \code{\link[fields]{Tps}}. It also allows interpolation using
-#' \code{\link[fields]{interpolate}}.
+#' \code{\link[raster]{interpolate}}.
 #' @export
 #' @import fields
 #'
@@ -71,7 +72,7 @@ sr_fdoi <- function(x, estimation_mask) {
 #' fm <- fit_surface(sro)
 #' summary(fm)
 #' plot(fm)    # Some model diagnostics plots
-#' surface(fm)  # Quick image/contour plot of predicted surface.
+#' fields::surface(fm)  # Quick image/contour plot of predicted surface.
 fit_surface <- function(x) {
   Tps(
     st_coordinates(x),

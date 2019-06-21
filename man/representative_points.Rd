@@ -22,6 +22,7 @@ each other.
 \examples{
 
 ## 50 points in the unit square
+require(sf)
 x <- st_sfc(st_multipoint(matrix(runif(100), ncol = 2)), crs = 3857)
 representative_points(x, .5)
 }

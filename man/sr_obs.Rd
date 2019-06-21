@@ -36,12 +36,12 @@ of multiple processors or cluster access if you set a proper
 \code{\link[future]{plan}} beforehand. See examples.
 }
 \examples{
-  d <- data.frame(lon = 1, lat = 1, date = 1)
-  sr_obs(d, "date")
+  d_geo <- data.frame(lon = 1, lat = 1, date = 1)
+  sr_obs(d_geo, "date")
 
   ## Projected coordinates
-  d <- data.frame(x = 1, y = 1, date = 1)
-  d.sf <- sf::st_as_sf(d, coords = c("x", "y"), crs = 27561)
+  d_prj <- data.frame(x = 1, y = 1, date = 1)
+  d.sf <- sf::st_as_sf(d_prj, coords = c("x", "y"), crs = 27561)
   sr_obs(d.sf, "date")
 
 \dontrun{
@@ -49,7 +49,7 @@ of multiple processors or cluster access if you set a proper
   library(furrr)
   plan(multiprocess)
   uq <- sr_uq(nsim = 3, space = 1, time = 1)
-  sr_obs(d, "date", uq = uq)
+  sr_obs(d_geo, "date", uq = uq)
 }
 
 }

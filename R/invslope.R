@@ -23,8 +23,8 @@
 #'
 #' ## A flat surface with constant slope of 1
 #' r_values <- replicate(100, seq(0.01, 1, length = 100))
-#' r <- raster(r_values, crs = sp::CRS("+init=epsg:3857"))
-#' plot(r)
+#' r <- raster::raster(r_values, crs = sp::CRS("+init=epsg:3857"))
+#' raster::plot(r)
 #' invslope(r)
 invslope <- function(x, rmtop, bnd) {
 

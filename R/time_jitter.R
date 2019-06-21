@@ -10,12 +10,12 @@
 #' values.
 #'
 #' @examples
-#' time_jitter(1:10, 1)  # Numeric input
-#' time_jitter(Sys.Date() + 1:10, 1)  # Date input
+#' spreadrate:::time_jitter(1:10, 1)  # Numeric input
+#' spreadrate:::time_jitter(Sys.Date() + 1:10, 1)  # Date input
 #'
 #' ## Distribution of jittering
 #' x <- seq.int(1e3)
-#' xj <- time_jitter(x, 5)
+#' xj <- spreadrate:::time_jitter(x, 5)
 #' barplot(table(x - xj))
 time_jitter <- function(x, e) {
 

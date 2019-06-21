@@ -25,6 +25,7 @@ Imports:
     fields,
     furrr,
     ggplot2,
+    lwgeom,
     raster,
     sf,
     sp

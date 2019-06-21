@@ -27,12 +27,12 @@
 #' @import furrr
 #'
 #' @examples
-#'   d <- data.frame(lon = 1, lat = 1, date = 1)
-#'   sr_obs(d, "date")
+#'   d_geo <- data.frame(lon = 1, lat = 1, date = 1)
+#'   sr_obs(d_geo, "date")
 #'
 #'   ## Projected coordinates
-#'   d <- data.frame(x = 1, y = 1, date = 1)
-#'   d.sf <- sf::st_as_sf(d, coords = c("x", "y"), crs = 27561)
+#'   d_prj <- data.frame(x = 1, y = 1, date = 1)
+#'   d.sf <- sf::st_as_sf(d_prj, coords = c("x", "y"), crs = 27561)
 #'   sr_obs(d.sf, "date")
 #'
 #' \dontrun{
@@ -40,12 +40,13 @@
 #'   library(furrr)
 #'   plan(multiprocess)
 #'   uq <- sr_uq(nsim = 3, space = 1, time = 1)
-#'   sr_obs(d, "date", uq = uq)
+#'   sr_obs(d_geo, "date", uq = uq)
 #' }
 #'
 sr_obs <- function(x, timevar, uq) UseMethod("sr_obs")
 
 #' @import sf
+#' @export
 sr_obs.data.frame <- function(x, timevar, uq = sr_uq()) {
 
   ## Argument assumptions
@@ -60,6 +61,7 @@ sr_obs.data.frame <- function(x, timevar, uq = sr_uq()) {
 }
 
 #' @import sf
+#' @export
 sr_obs.sf <- function(x, timevar, uq = sr_uq()) {
 
   ## Argument assumptions
@@ -119,17 +121,6 @@ spacetime_jitter <- function(x, uq) {
   return(ans)
 }
 
-#' Modify a vector of dates by a random quantity in [-e, e]
-#' The distribution decreases exponentially, with rate 1/2
-time_jitter <- function(x, e) {
-
-  prob_p <- 1/2^seq(0, e)
-  probs <- c(rev(prob_p), tail(prob_p, -1))
-  # probs <- probs/sum(probs)  # unnecessary
-
-  x + sample(seq(-e, e), size = length(x), prob = probs, replace = TRUE)
-
-}
 
 print.sr_obs <- function(x) {
   ## TODO: Provide a summary of the time variable and the UQ

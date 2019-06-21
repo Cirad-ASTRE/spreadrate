@@ -24,7 +24,8 @@ Given a set of observations, define a estimation template.
 \examples{
 
 ## Some random points in the unit square
-pp <- st_multipoint(matrix(runif(30), ncol = 2))
+pp <- sf::st_multipoint(matrix(runif(30), ncol = 2))
 (em <- estimation_mask(pp, buffer_size = .3, res = .1))
-plot(em); plot(pp, add = T)
+raster::plot(em)
+points(sf::st_coordinates(pp))
 }

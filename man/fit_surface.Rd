@@ -13,7 +13,7 @@ fit_surface(x)
 An object of class \code{Krig} and \code{Tps} which includes
 the fitted values and the model residuals. See
 \code{\link[fields]{Tps}}. It also allows interpolation using
-\code{\link[fields]{interpolate}}.
+\code{\link[raster]{interpolate}}.
 }
 \description{
 Fit a Thin-plate splines model to a set of observations
@@ -25,5 +25,5 @@ sro <- sr_obs(d, "date")
 fm <- fit_surface(sro)
 summary(fm)
 plot(fm)    # Some model diagnostics plots
-surface(fm)  # Quick image/contour plot of predicted surface.
+fields::surface(fm)  # Quick image/contour plot of predicted surface.
 }

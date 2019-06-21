@@ -16,6 +16,7 @@
 #'
 #' @examples
 #'
+#' require(sf)
 #' ## Randomly sample 50 point in the unit square
 #' x_mat <- matrix(runif(100), ncol = 2)
 #'
@@ -31,19 +32,9 @@
 #' ## Estimate local spread-rate
 #' ## in the units of the coordinates divided by the units of time
 #' sre <- sr(sro)
-#' plot(sre, col = hcl.colors(12))
+#' raster::plot(sre, col = hcl.colors(12))
 #' points(st_coordinates(sro))
 #'
-#'
-#'
-#'
-#' \dontrun{
-#'   ## Perform Monte Carlo samples in parallel
-#'   library(furrr)
-#'   plan(multiprocess)
-#'   uq <- sr_uq(nsim = 3, space = 1, time = 1)
-#'   sr_obs(d, "date", uq = uq)
-#' }
 sr <- function(
   x,
   r = estimation_mask(
