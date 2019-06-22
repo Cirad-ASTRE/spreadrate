@@ -21,9 +21,9 @@
 #' d <- data.frame(lon = runif(30), lat = runif(30))
 #' d <- transform(d, date = round(10 * sqrt(lon**2 + lat**2)))
 #' sro <- sr_obs(d, "date")
-#' r <- raster::raster(sf::st_sf(sro), vals = 1)
+#' r <- raster(st_sf(sro), vals = 1)
 #' fdoi <- sr_fdoi(sro, r)
-#' raster::plot(fdoi, col = hcl.colors(12))
+#' plot(fdoi, col = hcl.colors(12))
 #' points(d)
 sr_fdoi <- function(x, estimation_mask) {
 

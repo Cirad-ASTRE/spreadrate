@@ -32,7 +32,7 @@ values beyond a reasonable interval \code{bnd}.
 
 ## A flat surface with constant slope of 1
 r_values <- replicate(100, seq(0.01, 1, length = 100))
-r <- raster::raster(r_values, crs = sp::CRS("+init=epsg:3857"))
-raster::plot(r)
+r <- raster(r_values, crs = sp::CRS("+init=epsg:3857"))
+plot(r)
 invslope(r)
 }

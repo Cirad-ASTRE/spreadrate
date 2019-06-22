@@ -18,10 +18,10 @@
 #' @examples
 #'
 #' ## Some random points in the unit square
-#' pp <- sf::st_multipoint(matrix(runif(30), ncol = 2))
+#' pp <- st_multipoint(matrix(runif(30), ncol = 2))
 #' (em <- estimation_mask(pp, buffer_size = .3, res = .1))
-#' raster::plot(em)
-#' points(sf::st_coordinates(pp))
+#' plot(em)
+#' points(st_coordinates(pp))
 estimation_mask <- function(x, buffer_size, res = buffer_size/8) {
 
   estimation_region <-

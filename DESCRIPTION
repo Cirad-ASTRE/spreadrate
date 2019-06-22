@@ -1,7 +1,7 @@
 Package: spreadrate
 Type: Package
 Title: Estimate the spread-rate of epidemics
-Version: 0.0.2
+Version: 0.0.3
 Date: 2019-06-22
 Authors@R: person("Facundo", "Muñoz", email = "facundo.munoz@cirad.fr",
         role = c("aut", "cre"), comment = c(ORCID =
@@ -14,14 +14,14 @@ Description: Estimate the local velocity of propagation of an epidemic
         surface. Quantify the estimation uncertainty by a Monte Carlo
         approach. Visualise and simulate the spatio-temporal progress
         of epidemics.
-Depends: R (>= 3.2)
+Depends: R (>= 3.2), sf, raster
 License: GPL-3 | file LICENSE
 Language: en-GB
 Encoding: UTF-8
 LazyData: true
 URL: https://Cirad-ASTRE.github.io/spreadrate
 BugReports: https://github.com/Cirad-ASTRE/spreadrate/issues
-Imports: fields, furrr, ggplot2, lwgeom, raster, sf, sp
-Suggests: INLA, testthat (>= 2.1.0)
+Imports: fields, furrr, lwgeom, sp
+Suggests: INLA, testthat (>= 2.1.0), ggplot2
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 6.1.1

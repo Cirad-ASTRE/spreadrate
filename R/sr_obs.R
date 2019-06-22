@@ -32,7 +32,7 @@
 #'
 #'   ## Projected coordinates
 #'   d_prj <- data.frame(x = 1, y = 1, date = 1)
-#'   d.sf <- sf::st_as_sf(d_prj, coords = c("x", "y"), crs = 27561)
+#'   d.sf <- st_as_sf(d_prj, coords = c("x", "y"), crs = 27561)
 #'   sr_obs(d.sf, "date")
 #'
 #' \dontrun{

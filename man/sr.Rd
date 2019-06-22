@@ -39,7 +39,7 @@ uq = sr_uq(6, .2, .2, .3))
 ## Estimate local spread-rate
 ## in the units of the coordinates divided by the units of time
 sre <- sr(sro)
-raster::plot(sre, col = hcl.colors(12))
+plot(sre, col = hcl.colors(12))
 points(st_coordinates(sro))
 
 }
