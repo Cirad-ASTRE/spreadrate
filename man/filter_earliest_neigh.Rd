@@ -8,8 +8,6 @@ filter_earliest_neigh(x)
 }
 \arguments{
 \item{x}{sr_obs object.}
-
-\item{dist}{Distance parameter in m.}
 }
 \value{
 Another sr_obs object with a subset of the points and

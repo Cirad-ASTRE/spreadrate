@@ -114,7 +114,7 @@ mc_sample <- function(x) {
 }
 
 
-#' Variation in data resolution
+# Variation in data resolution
 spacetime_jitter <- function(x, uq) {
   ans <- st_jitter(x, uq$space)
   ans[[attr(x, "timevar")]] <- time_jitter(x[[attr(x, "timevar")]], uq$time)

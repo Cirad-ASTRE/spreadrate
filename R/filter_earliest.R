@@ -14,7 +14,6 @@
 #' is the mean value of the interval specified in its \code{uq}.
 #'
 #' @param x sr_obs object.
-#' @param dist Distance parameter in m.
 #'
 #' @return Another sr_obs object with a subset of the points and
 #' the earliest times observed in the neighbourhood of each.
