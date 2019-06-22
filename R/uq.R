@@ -51,7 +51,7 @@ sr_uq <- function(
   nsim = 1L,
   space = 0,
   time = 0,
-  neigh_tol = -2.5
+  neigh_tol = -4.5
 ) {
 
   stopifnot(

@@ -4,7 +4,7 @@
 \alias{sr_uq}
 \title{Parameters for Uncertainty Quantification}
 \usage{
-sr_uq(nsim = 1L, space = 0, time = 0, neigh_tol = -2.5)
+sr_uq(nsim = 1L, space = 0, time = 0, neigh_tol = -4.5)
 }
 \arguments{
 \item{nsim}{Integer > 0. Number of Monte Carlo replicates.}
