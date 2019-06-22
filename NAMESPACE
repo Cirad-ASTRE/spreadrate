@@ -2,6 +2,7 @@
 
 S3method(sr_obs,data.frame)
 S3method(sr_obs,sf)
+S3method(st_transform,sr_obs)
 export(dist2arc)
 export(estimation_mask)
 export(filter_earliest_neigh)
