@@ -55,8 +55,6 @@ into a table like this one.
 
 Here is a visual representation of these observed cases.
 
-    #> Loading required package: tmap
-
 <img src="man/figures/README-map-obs-1.png" width="100%" />
 
 First let `spreadrate` interpret the observational data appropriately
@@ -106,3 +104,10 @@ raster::plot(attr(sr_est, "fdoi"), col = hcl.colors(12))
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+
+## References
+
+**Tisseuil, Clément, Aiko Gryspeirt, Renaud Lancelot, Maryline Pioz,
+Andrew Liebhold, and Marius Gilbert (2016)**. Evaluating Methods to
+Quantify Spatial Variation in the Velocity of Biological Invasions.
+*Ecography* 39, no. 5: 409–418. <https://doi.org/10.1111/ecog.01393>.

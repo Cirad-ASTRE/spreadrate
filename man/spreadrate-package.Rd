@@ -7,17 +7,25 @@
 \title{spreadrate: Estimate the spread-rate of epidemics}
 \description{
 Estimate the local velocity of propagation of an epidemic
-    event, given dates and locations of observed cases. The method
-    estimates the surface of first date of invasion by interpolation
-    of the earliest observations in a neighbourhood and derives the
-    local spread rate as the inverse slope of the surface. Quantify
-    the estimation uncertainty by a Monte Carlo approach. Visualise 
-    and simulate the spatio-temporal progress of epidemics.
+        event, given dates and locations of observed cases. The method
+        estimates the surface of first date of invasion by
+        interpolation of the earliest observations in a neighbourhood
+        and derives the local spread rate as the inverse slope of the
+        surface. Quantify the estimation uncertainty by a Monte Carlo
+        approach. Visualise and simulate the spatio-temporal progress
+        of epidemics.
 }
 \details{
 The main functions are \code{\link{sr_obs}} to define
 a dataset of observations prepared for spread-rate estimation, and
 \code{\link{sr}} for actually performing the estimation.
+}
+\references{
+Tisseuil, Clément, Aiko Gryspeirt, Renaud Lancelot,
+  Maryline Pioz, Andrew Liebhold, and Marius Gilbert. ‘Evaluating
+  Methods to Quantify Spatial Variation in the Velocity of
+  Biological Invasions’. Ecography 39, no. 5 (May 2016): 409–418.
+  https://doi.org/10.1111/ecog.01393.
 }
 \seealso{
 Useful links:

@@ -89,7 +89,7 @@ cases_sf <- st_sf(locs, date = as.Date("2019-01-01") + dist_NE / velocity) %>%
 
 Here is a visual representation of these observed cases.
 
-```{r map-obs, echo = FALSE}
+```{r map-obs, echo = FALSE, message=FALSE}
 require(tmap)
 tm_shape(fr_sf) +
   ## Country limits
@@ -160,3 +160,10 @@ We can also retrieve the estimated surface of first-date of invasion:
 raster::plot(attr(sr_est, "fdoi"), col = hcl.colors(12))
 ```
 
+
+## References
+
+__Tisseuil, Clément, Aiko Gryspeirt, Renaud Lancelot, Maryline Pioz,
+Andrew Liebhold, and Marius Gilbert (2016)__. Evaluating Methods to Quantify
+Spatial Variation in the Velocity of Biological Invasions. _Ecography_
+39, no. 5: 409–418. https://doi.org/10.1111/ecog.01393.
