@@ -1,7 +1,7 @@
 Package: spreadrate
 Type: Package
 Title: Estimate the spread-rate of epidemics
-Version: 0.0.4
+Version: 0.1
 Date: 2019-06-22
 Authors@R: person("Facundo", "Muñoz", email = "facundo.munoz@cirad.fr",
         role = c("aut", "cre"), comment = c(ORCID =

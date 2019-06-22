@@ -1,3 +1,3 @@
-# spreadrate 0.0.4
+# spreadrate 0.1
 
-* Added a `NEWS.md` file to track changes to the package.
+* First operational beta-version released.

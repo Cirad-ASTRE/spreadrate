@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">spreadrate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1</span>
       </span>
     </div>
 
@@ -51,6 +51,9 @@
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li>
+  <a href="news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -109,16 +112,21 @@
 <p><img src="reference/figures/README-map-obs-1.png" width="100%"></p>
 <p>First let <code>spreadrate</code> interpret the observational data appropriately with the function <code><a href="reference/sr_obs.html">sr_obs()</a></code>. You need to specify the name of the temporal variable. <em>Lon</em> and <em>Lat</em> are recognised automatically.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(spreadrate)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">cases_sr &lt;-<span class="st"> </span><span class="kw"><a href="reference/sr_obs.html">sr_obs</a></span>(cases, <span class="st">"date"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; Loading required package: raster</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Loading required package: sp</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; Attaching package: 'raster'</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt;     select</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; The following object is masked from 'package:tidyr':</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt;     extract</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">cases_sr &lt;-<span class="st"> </span><span class="kw"><a href="reference/sr_obs.html">sr_obs</a></span>(cases, <span class="st">"date"</span>)</a></code></pre></div>
 <p>However, spread-rate calculations require projected (rather than geographic) coordinates. An appropriate projection for mainland France is EPSG:2154. See <a href="https://epsg.io/" class="uri">https://epsg.io/</a>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">cases_sr &lt;-<span class="st"> </span><span class="kw">st_transform</span>(cases_sr, <span class="dt">crs =</span> <span class="dv">2154</span>)</a></code></pre></div>
 <p>Everything is now set to perform a default estimation of spread-rate.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">sr_est &lt;-<span class="st"> </span><span class="kw"><a href="reference/sr.html">sr</a></span>(cases_sr)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; Warning: </span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Grid searches over lambda (nugget and sill variances) with  minima at the endpoints: </span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt;   (GCV) Generalized Cross-Validation </span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt;    minimum at  right endpoint  lambda  =  1.377511e-05 (eff. df= 41.79999 </span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; )</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">sr_est &lt;-<span class="st"> </span><span class="kw"><a href="reference/sr.html">sr</a></span>(cases_sr)</a></code></pre></div>
 <p>Done! Here is a quick plot of the estimated local spread-rate. The estimated velocity is practically constant, between 9 and 11 km / day.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">raster<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(sr_est, <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/grDevices/topics/palettes">hcl.colors</a></span>(<span class="dv">12</span>))</a></code></pre></div>
 <p><img src="reference/figures/README-quick-plot-1.png" width="100%"></p>
@@ -126,6 +134,11 @@
 <p>We can also retrieve the estimated surface of first-date of invasion:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">raster<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attr">attr</a></span>(sr_est, <span class="st">"fdoi"</span>), <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/grDevices/topics/palettes">hcl.colors</a></span>(<span class="dv">12</span>))</a></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="100%"></p>
+</div>
+<div id="references" class="section level2">
+<h2 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h2>
+<p><strong>Tisseuil, Clément, Aiko Gryspeirt, Renaud Lancelot, Maryline Pioz, Andrew Liebhold, and Marius Gilbert (2016)</strong>. Evaluating Methods to Quantify Spatial Variation in the Velocity of Biological Invasions. <em>Ecography</em> 39, no. 5: 409–418. <a href="https://doi.org/10.1111/ecog.01393" class="uri">https://doi.org/10.1111/ecog.01393</a>.</p>
 </div>
 </div>
   </div>

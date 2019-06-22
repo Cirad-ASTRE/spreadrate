@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>First-date of invasion — sr_fdoi • spreadrate</title>
+<title>Transform coordinates of a sr_obs object — st_transform.sr_obs • spreadrate</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,10 @@
 
 
 
-<meta property="og:title" content="First-date of invasion — sr_fdoi" />
+<meta property="og:title" content="Transform coordinates of a sr_obs object — st_transform.sr_obs" />
 
-<meta property="og:description" content="Estimate a surface of first-date of invasion, given a sparse set
-of observation locations and times." />
+<meta property="og:description" content="Transform the underlying sf object and all the MC replicas,
+if any." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -98,53 +98,72 @@ of observation locations and times." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>First-date of invasion</h1>
+    <h1>Transform coordinates of a sr_obs object</h1>
     
-    <div class="hidden name"><code>sr_fdoi.Rd</code></div>
+    <div class="hidden name"><code>st_transform.sr_obs.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Estimate a surface of first-date of invasion, given a sparse set
-of observation locations and times.</p>
+    <p>Transform the underlying <code>sf</code> object and all the MC replicas,
+if any.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>sr_fdoi</span>(<span class='no'>x</span>, <span class='no'>estimation_mask</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for sr_obs</span>
+<span class='fu'>st_transform</span>(<span class='no'>x</span>, <span class='no'>crs</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A <code>sr_obs</code> object defined with <code><a href='sr_obs.html'>sr_obs</a></code>.</p></td>
+      <td><p>A <code>sr_obs</code> object created with <code><a href='sr_obs.html'>sr_obs</a></code>.</p></td>
     </tr>
     <tr>
-      <th>estimation_mask</th>
-      <td><p>A <code>raster</code> template for results.</p></td>
+      <th>crs</th>
+      <td><p>Coordinate reference system: inteer with the EPSG code
+or character with proj4string</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Ignored</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A RasterLayer with estimated dates of invasion at each
-  pixel.</p>
-    
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>This function first takes the earliest observed case in a neighbourhood,
-as defined by the parameter <code>neigh_tol</code> in the definition of
-<code>x</code>. Next, it interpolates the earliest observations with a
-smooth surface, using a Thin-Plate splines model.</p>
+    <p>A <code>sr_obs</code> object in the target projection.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>lon</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='fl'>30</span>), <span class='kw'>lat</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='fl'>30</span>))
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/transform'>transform</a></span>(<span class='no'>d</span>, <span class='kw'>date</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>round</a></span>(<span class='fl'>10</span> * <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>sqrt</a></span>(<span class='no'>lon</span>**<span class='fl'>2</span> + <span class='no'>lat</span>**<span class='fl'>2</span>)))
-<span class='no'>sro</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sr_obs.html'>sr_obs</a></span>(<span class='no'>d</span>, <span class='st'>"date"</span>)
-<span class='no'>r</span> <span class='kw'>&lt;-</span> <span class='fu'>raster</span>(<span class='fu'>st_sf</span>(<span class='no'>sro</span>), <span class='kw'>vals</span> <span class='kw'>=</span> <span class='fl'>1</span>)
-<span class='no'>fdoi</span> <span class='kw'>&lt;-</span> <span class='fu'>sr_fdoi</span>(<span class='no'>sro</span>, <span class='no'>r</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>fdoi</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/grDevices/topics/palettes'>hcl.colors</a></span>(<span class='fl'>12</span>))</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/points'>points</a></span>(<span class='no'>d</span>)</div><div class='img'><img src='sr_fdoi-1.png' alt='' width='700' height='433' /></div></pre>
+    <pre class="examples"><div class='input'><span class='co'>## Some observed data and MC replicates in longitude/latitude</span>
+<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sr_obs.html'>sr_obs</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>lat</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>lon</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>day</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='st'>"day"</span>, <span class='kw'>uq</span> <span class='kw'>=</span> <span class='fu'><a href='sr_uq.html'>sr_uq</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>1</span>))
+<span class='fu'>st_crs</span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; Coordinate Reference System:
+#&gt;   EPSG: 4326 
+#&gt;   proj4string: "+proj=longlat +datum=WGS84 +no_defs"</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lapply'>lapply</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/attr'>attr</a></span>(<span class='no'>x</span>, <span class='st'>"mc"</span>), <span class='no'>st_crs</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; Coordinate Reference System:
+#&gt;   EPSG: 4326 
+#&gt;   proj4string: "+proj=longlat +datum=WGS84 +no_defs"
+#&gt; 
+#&gt; [[2]]
+#&gt; Coordinate Reference System:
+#&gt;   EPSG: 4326 
+#&gt;   proj4string: "+proj=longlat +datum=WGS84 +no_defs"
+#&gt; </div><div class='input'>
+<span class='no'>xt</span> <span class='kw'>&lt;-</span> <span class='fu'>st_transform</span>(<span class='no'>x</span>, <span class='fl'>3857</span>)
+<span class='fu'>st_crs</span>(<span class='no'>xt</span>)</div><div class='output co'>#&gt; Coordinate Reference System:
+#&gt;   EPSG: 3857 
+#&gt;   proj4string: "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lapply'>lapply</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/attr'>attr</a></span>(<span class='no'>xt</span>, <span class='st'>"mc"</span>), <span class='no'>st_crs</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; Coordinate Reference System:
+#&gt;   EPSG: 3857 
+#&gt;   proj4string: "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"
+#&gt; 
+#&gt; [[2]]
+#&gt; Coordinate Reference System:
+#&gt;   EPSG: 3857 
+#&gt;   proj4string: "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -152,8 +171,6 @@ smooth surface, using a Thin-Plate splines model.</p>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-
-      <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

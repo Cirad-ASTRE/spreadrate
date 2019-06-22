@@ -64,7 +64,7 @@ estimation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">spreadrate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1</span>
       </span>
     </div>
 
@@ -78,6 +78,9 @@ estimation." />
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -158,7 +161,7 @@ of multiple processors or cluster access if you set a proper
 #&gt; 1    1 POINT (1 1)</div><div class='input'>
   <span class='co'>## Projected coordinates</span>
   <span class='no'>d_prj</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>date</span> <span class='kw'>=</span> <span class='fl'>1</span>)
-  <span class='no'>d.sf</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/sf/topics/st_as_sf'>st_as_sf</a></span>(<span class='no'>d_prj</span>, <span class='kw'>coords</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>), <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>27561</span>)
+  <span class='no'>d.sf</span> <span class='kw'>&lt;-</span> <span class='fu'>st_as_sf</span>(<span class='no'>d_prj</span>, <span class='kw'>coords</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>), <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>27561</span>)
   <span class='fu'>sr_obs</span>(<span class='no'>d.sf</span>, <span class='st'>"date"</span>)</div><div class='output co'>#&gt; Simple feature collection with 1 feature and 1 field
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
