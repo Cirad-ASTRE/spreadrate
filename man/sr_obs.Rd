@@ -8,7 +8,7 @@ sr_obs(x, timevar, uq)
 }
 \arguments{
 \item{x}{\code{data frame} with geographical coordinates or
-\code{sf} object of type POINT.}
+\code{sf} object of type POINT, or another \code{sr_obs} object.}
 
 \item{timevar}{Character. Variable name with observation times or
 dates.}

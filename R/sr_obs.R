@@ -15,7 +15,7 @@
 #' \code{\link[future]{plan}} beforehand. See examples.
 #'
 #' @param x \code{data frame} with geographical coordinates or
-#'   \code{sf} object of type POINT.
+#'   \code{sf} object of type POINT, or another \code{sr_obs} object.
 #' @param timevar Character. Variable name with observation times or
 #'   dates.
 #' @param uq Object created with \code{sr_uq()} with parameters of
@@ -58,6 +58,22 @@ sr_obs.data.frame <- function(x, timevar, uq = sr_uq()) {
 
   sr_obs.sf(xf, timevar, uq)
 
+}
+
+#' @import sf
+#' @export
+sr_obs.sr_obs <- function(x, timevar, uq) {
+
+  ## sr_obs have already defined the timevar and uq
+  ## They can be overriden or preserved if missing.
+  if (missing(timevar)) {
+    timevar <- attr(x, "timevar")
+  }
+  if (missing(uq)) {
+    timevar <- attr(x, "uq")
+  }
+
+  sr_obs.sf(x, timevar, uq)
 }
 
 #' @import sf
