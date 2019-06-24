@@ -148,7 +148,7 @@ The estimated velocity is practically constant, between 9 and 11 km /
 day.
 
 ```{r quick-plot}
-raster::plot(sr_est, col = hcl.colors(12))
+plot(sr_est, col = hcl.colors(12))
 ```
 
 This is consistent with the value of `r velocity` m/day used for
@@ -157,7 +157,7 @@ simulating the data.
 We can also retrieve the estimated surface of first-date of invasion:
 
 ```{r}
-raster::plot(attr(sr_est, "fdoi"), col = hcl.colors(12))
+plot(attr(sr_est, "fdoi"), col = hcl.colors(12))
 ```
 
 
