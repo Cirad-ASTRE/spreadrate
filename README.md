@@ -1,7 +1,8 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # spreadrate
+
+## This project moved to https://forgemia.inra.fr/umr-astre/spreadrate/
+
 
 <!-- badges: start -->
 
